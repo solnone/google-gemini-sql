@@ -1,7 +1,7 @@
 import os
 
-import streamlit as st
 import google.generativeai as genai
+import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,18 +19,18 @@ def main():
         """,
         unsafe_allow_html=True
     )
-    input = st.text_area("Enter your query here in Plain Language:")
+    prompt = st.text_area("Enter your query here in Plain Language:")
 
     submit = st.button("Generate SQL Query")
     if submit:
         template = f"""
         Create a SQL query snippet using the below text:
         ```
-        {input}
+        {prompt}
         ```
         I just want a SQL Query.
         """
-        formatted_template = template.format(input=input)
+        formatted_template = template.format(input=prompt)
         response = model.generate_content(formatted_template)
         sql_query = response.text
         sql_query = sql_query.strip().lstrip("```sql").rstrip("```")
