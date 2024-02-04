@@ -25,12 +25,17 @@ def read_sql_query(sql, db):
     return conn.query(sql)
 
 
-def main():
-    # load all the environment variables
-    load_dotenv()
+def get_api_key():
+    try:
+        return st.secrets["GOOGLE_API_KEY"]
+    except Exception as e:
+        load_dotenv()
+        return os.getenv("GOOGLE_API_KEY")
 
+
+def main():
     # Configure Genai Key
-    genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+    genai.configure(api_key=get_api_key())
 
     # Define Your Prompt
     prompt = """
