@@ -1,10 +1,9 @@
 import os
-import sqlite3
 
 import google.generativeai as genai
-import pandas as pd
 import streamlit as st
 from dotenv import load_dotenv
+from sqlalchemy.sql import text
 
 from database import create_table_insert_data
 
@@ -18,18 +17,12 @@ def get_gemini_response(prompt):
 
 # Function To retrieve query from the database
 def read_sql_query(sql, db):
-    conn = sqlite3.connect(db)
-    try:
-        cur = conn.cursor()
-        create_table_insert_data(cur)
-        cur.execute(sql)
-        rows = cur.fetchall()
-        df = pd.DataFrame(rows, columns=list(map(lambda x: x[0], cur.description)))
-        conn.commit()
-    finally:
-        conn.close()
-
-    return df
+    # Create the SQL connection to student_db as specified in your secrets file.
+    conn = st.connection(db, type='sql')
+    session = conn.session
+    create_table_insert_data(session, text)
+    session.commit()
+    return conn.query(sql)
 
 
 def main():
@@ -68,7 +61,7 @@ def main():
         st.success("SQL query generated successfully:")
         st.code(sql, language="sql")
 
-        df = read_sql_query(sql, "student.db")
+        df = read_sql_query(sql, 'student_db')
         st.subheader("The response is")
         st.dataframe(df)
 
