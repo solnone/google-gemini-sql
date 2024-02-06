@@ -23,7 +23,7 @@ def main():
 
     submit = st.button("Generate SQL Query")
     if submit:
-        template = f"""
+        template = """
         Create a SQL query snippet using the below text:
         ```
         {prompt}
@@ -40,7 +40,7 @@ def main():
             # st.markdown(sql_query)
             st.code(sql_query, language="sql")
 
-            expected_output = f"""
+            expected_output = """
             What would by the expected response of this SQL query snippet:
             ```sql
             {sql_query}
