@@ -41,9 +41,16 @@ def read_sql_query(sql, db):
     # Create the SQL connection to student_db as specified in your secrets file.
     conn = st.connection(db, type='sql')
     session = conn.session
-    create_table_insert_data(session, text)
-    session.commit()
-    return conn.query(sql)
+    try:
+        create_table_insert_data(session, text)
+        if sql.startswith("INSERT ") or sql.startswith("UPDATE ") or sql.startswith("DELETE "):
+            session.execute(text(sql))
+            sql = 'SELECT * FROM student'
+
+    finally:
+        session.commit()
+
+    return session.execute(text(sql))
 
 
 def get_api_key():
@@ -72,6 +79,9 @@ def main(api_key):
         st.code(sql, language="sql")
         df = read_sql_query(sql, 'student_db')
         st.subheader("The response is")
+        st.dataframe(df)
+    else:
+        df = read_sql_query('SELECT * FROM student', 'student_db')
         st.dataframe(df)
 
 
